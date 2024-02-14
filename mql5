@@ -1,0 +1,69 @@
+
+// Forex Robot Easy Team
+// forexroboteasy.com
+
+// Support Resistance Propulsion Targets MT5
+
+// Function to draw support and resistance lines based on historical data
+void DrawSupportResistanceLines()
+{
+    // Identify last two days, six weeks, and six months data
+    datetime lastTwoDays = iTime(_Symbol, PERIOD_D1, 2);
+    datetime lastSixWeeks = iTime(_Symbol, PERIOD_W1, 6);
+    datetime lastSixMonths = iTime(_Symbol, PERIOD_MN1, 6);
+
+    // Draw support and resistance lines using historical data
+    ObjectCreate(0, 'SupportLine1', OBJ_TREND, 0, lastTwoDays, iLow(_Symbol, PERIOD_D1, 2), Time[0], Low[0]);
+    ObjectSetInteger(0, 'SupportLine1', OBJPROP_COLOR, clrGreen);
+    ObjectSetInteger(0, 'SupportLine1', OBJPROP_STYLE, STYLE_SOLID);
+
+    ObjectCreate(0, 'SupportLine2', OBJ_TREND, 0, lastSixWeeks, iLow(_Symbol, PERIOD_W1, 6), Time[0], Low[0]);
+    ObjectSetInteger(0, 'SupportLine2', OBJPROP_COLOR, clrGreen);
+    ObjectSetInteger(0, 'SupportLine2', OBJPROP_STYLE, STYLE_DOT);
+
+    ObjectCreate(0, 'SupportLine3', OBJ_TREND, 0, lastSixMonths, iLow(_Symbol, PERIOD_MN1, 6), Time[0], Low[0]);
+    ObjectSetInteger(0, 'SupportLine3', OBJPROP_COLOR, clrGreen);
+    ObjectSetInteger(0, 'SupportLine3', OBJPROP_STYLE, STYLE_DASH);
+
+    ObjectCreate(0, 'ResistanceLine1', OBJ_TREND, 0, lastTwoDays, iHigh(_Symbol, PERIOD_D1, 2), Time[0], High[0]);
+    ObjectSetInteger(0, 'ResistanceLine1', OBJPROP_COLOR, clrRed);
+    ObjectSetInteger(0, 'ResistanceLine1', OBJPROP_STYLE, STYLE_SOLID);
+
+    ObjectCreate(0, 'ResistanceLine2', OBJ_TREND, 0, lastSixWeeks, iHigh(_Symbol, PERIOD_W1, 6), Time[0], High[0]);
+    ObjectSetInteger(0, 'ResistanceLine2', OBJPROP_COLOR, clrRed);
+    ObjectSetInteger(0, 'ResistanceLine2', OBJPROP_STYLE, STYLE_DOT);
+
+    ObjectCreate(0, 'ResistanceLine3', OBJ_TREND, 0, lastSixMonths, iHigh(_Symbol, PERIOD_MN1, 6), Time[0], High[0]);
+    ObjectSetInteger(0, 'ResistanceLine3', OBJPROP_COLOR, clrRed);
+    ObjectSetInteger(0, 'ResistanceLine3', OBJPROP_STYLE, STYLE_DASH);
+}
+
+// Function to identify propulsion candle gaps on the chart
+void IdentifyPropulsionCandleGaps()
+{
+    // Loop through all candles
+    for (int i = 0; i < Bars; i++)
+    {
+        // Calculate gap between current candle and next candle
+        double gap = MathAbs(Close[i] - Open[i+1]);
+
+        // If gap is significant, highlight it
+        if (gap > 0.01)
+        {
+            ObjectCreate(0, 'PropulsionGap' + IntegerToString(i), OBJ_RECTANGLE_LABEL, 0, Time[i], Low[i], Time[i+1], High[i+1]);
+            ObjectSetInteger(0, 'PropulsionGap' + IntegerToString(i), OBJPROP_COLOR, clrYellow);
+            ObjectSetInteger(0, 'PropulsionGap' + IntegerToString(i), OBJPROP_STYLE, STYLE_SOLID);
+            ObjectSetText(0, 'Propulsion Gap', 10, 'Arial', clrWhite);
+        }
+    }
+}
+
+// Entry point of the program
+void OnStart()
+{
+    // Draw support and resistance lines
+    DrawSupportResistanceLines();
+
+    // Identify propulsion candle gaps
+    IdentifyPropulsionCandleGaps();
+}
